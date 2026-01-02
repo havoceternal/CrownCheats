@@ -1,0 +1,433 @@
+-- UI MODULE
+-- This module handles all UI creation and returns the necessary references
+
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local repo = "https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/"
+
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/havoceternal/uilib/refs/heads/main/uilib'))()
+local ThemeManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/havoceternal/uilibthememanagerlol/refs/heads/main/theme'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local UI = {}
+
+-- Initialize shop items list
+local IgnoredShop = workspace.Ignored.Shop
+UI.itemShop = {}
+
+for _,Item in ipairs(IgnoredShop:GetDescendants()) do
+	if Item:FindFirstChild("Head") and Item:FindFirstChild("ClickDetector") and Item:FindFirstChild("Price") and not table.find(UI.itemShop,Item.Name) and not string.find(Item.Name,"Armor") and not string.find(Item.Name,"Ammo") then
+		table.insert(UI.itemShop,Item.Name)
+	end
+end
+
+function UI:Initialize()
+	local Window = Library:CreateWindow({
+		Title = "Crown - discord.gg/blatantusers";
+		Center = true;
+		AutoShow = true;
+		TabPadding = 8;
+		MenuFadeTime = 0;
+	})
+
+	local Tabs = {
+		Main = Window:AddTab("main");
+		Character = Window:AddTab("character");
+		Visuals = Window:AddTab("visuals");
+		Misc = Window:AddTab("misc");
+		Settings = Window:AddTab("settings");
+	}
+
+	-- MAIN TAB
+	local SilentAimGroupBox = Tabs.Main:AddLeftGroupbox("silent aim")
+	local AimbotGroupBox = Tabs.Main:AddRightGroupbox("aimbot")
+	local TargetingGroupBox = Tabs.Main:AddLeftGroupbox("targeting")
+	local RageBotGroupBox = Tabs.Main:AddLeftGroupbox("ragebot")
+	local GunGroupBox = Tabs.Main:AddRightGroupbox("gun")
+	local KillAuraGroupBox = Tabs.Main:AddRightGroupbox("kill aura")
+
+	TargetingGroupBox:AddToggle("StickyAimToggle",{
+		Text = "sticky aim";
+	}):AddKeyPicker("StickyAimKey",{
+		Text = "sticky aim";
+		Default = "X";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	TargetingGroupBox:AddToggle("TargetingVisibleOnly",{
+		Text = "visible only";
+	})
+	TargetingGroupBox:AddToggle("TargetingIgnoreProtected",{
+		Text = "ignore protected";
+	})
+	TargetingGroupBox:AddToggle("TargetingIgnoreKnocked",{
+		Text = "ignore knocked";
+	})
+
+	RageBotGroupBox:AddToggle("RageBotToggle",{
+		Text = "enabled";
+	}):AddKeyPicker("RageBotKey",{
+		Text = "rage bot";
+		Default = "V";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	RageBotGroupBox:AddToggle("RageBotSelectTargets",{
+		Text = "select targets"
+	})
+	local SelectedTargetsDepBox = RageBotGroupBox:AddDependencyBox()
+	SelectedTargetsDepBox:AddDropdown("RageBotSelectedTargets",{
+		SpecialType = "Player";
+		Text = "target(s)";
+		Multi = true;
+	})
+	SelectedTargetsDepBox:SetupDependencies({{Toggles.RageBotSelectTargets,true}})
+	RageBotGroupBox:AddDropdown("RageBotSettings",{
+		Text = "settings";
+		Values = {"view","auto stomp","void spam","position resolver"};
+		Default = 0;
+		Multi = true;
+	})
+
+	GunGroupBox:AddToggle("AutoReload",{
+		Text = "auto reload"
+	})
+	GunGroupBox:AddToggle("AutoBuyAmmo",{
+		Text = "auto buy ammo"
+	})
+	GunGroupBox:AddToggle("NoRecoil",{
+		Text = "no recoil"
+	})
+
+	KillAuraGroupBox:AddToggle("KillAuraToggle",{
+		Text = "enabled"
+	}):AddKeyPicker("KillAuraKey",{
+		Text = "kill aura";
+		Default = "T";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+
+	-- CHARACTER TAB
+	local MovementGroupBox = Tabs.Character:AddLeftGroupbox("movement")
+	local CharacterGroupBox = Tabs.Character:AddRightGroupbox("character")
+	local CharacterSettingsGroupBox = Tabs.Character:AddRightGroupbox("character settings")
+	local DesyncGroupBox = Tabs.Character:AddLeftGroupbox("desync")
+	local ProtectionGroupBox = Tabs.Character:AddRightGroupbox("protection")
+	local VelocityBreakerGroupBox = Tabs.Character:AddRightGroupbox("velocity breaker")
+
+	MovementGroupBox:AddToggle("VelocityToggle",{
+		Text = "velocity"
+	}):AddKeyPicker("VelocityKey",{
+		Text = "velocity";
+		Default = "X";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	MovementGroupBox:AddToggle("WalkSpeedToggle",{
+		Text = "walk speed"
+	})
+	MovementGroupBox:AddToggle("JumpPowerToggle",{
+		Text = "jump power"
+	})
+	MovementGroupBox:AddSlider("VelocitySpeed",{
+		Text = "velocity speed";
+		Default = 99;
+		Min = 1;
+		Max = 1000;
+		Rounding = 0;
+		Compact = true;
+		Suffix = "s";
+	})
+	MovementGroupBox:AddSlider("WalkSpeed",{
+		Text = "walk speed";
+		Default = 16;
+		Min = 1;
+		Max = 1000;
+		Rounding = 0;
+		Compact = true;
+		Suffix = "s";
+	})
+	MovementGroupBox:AddSlider("JumpPower",{
+		Text = "jump power";
+		Default = 50;
+		Min = 1;
+		Max = 1000;
+		Rounding = 0;
+		Compact = true;
+		Suffix = "s";
+	})
+
+	CharacterGroupBox:AddToggle("NoClipToggle",{
+		Text = "noclip"
+	}):AddKeyPicker("NoClipKey",{
+		Text = "noclip";
+		Default = "J";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	CharacterGroupBox:AddToggle("FlyToggle",{
+		Text = "fly"
+	}):AddKeyPicker("FlyKey",{
+		Text = "fly";
+		Default = "H";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	CharacterGroupBox:AddToggle("CFrameToggle",{
+		Text = "cframe"
+	}):AddKeyPicker("CFrameKey",{
+		Text = "cframe";
+		Default = "F";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	CharacterGroupBox:AddSlider("FlySpeed",{
+		Text = "fly speed";
+		Default = 135;
+		Min = 0;
+		Max = 3000;
+		Rounding = 0;
+		Compact = true;
+		Suffix = "s";
+	})
+	CharacterGroupBox:AddSlider("CFrameSpeed",{
+		Text = "cframe speed";
+		Default = 135;
+		Min = 0;
+		Max = 3000;
+		Rounding = 0;
+		Compact = true;
+		Suffix = "s";
+	})
+
+	CharacterSettingsGroupBox:AddToggle("AntiSlow",{
+		Text = "anti slow"
+	})
+	CharacterSettingsGroupBox:AddToggle("AntiJumpCooldown",{
+		Text = "anti jumpcooldown"
+	})
+
+	ProtectionGroupBox:AddToggle("AntiStomp",{
+		Text = "anti stomp"
+	})
+
+	VelocityBreakerGroupBox:AddToggle("VelocityBreakerToggle",{	
+		Text = "velocity breaker"
+	}):AddKeyPicker("VelocityBreakerKey",{
+		Text = "velocity breaker";
+		Default = "U";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+
+	DesyncGroupBox:AddToggle("DesyncToggle",{
+		Text = "enabled"
+	}):AddKeyPicker("DesyncKey",{
+		Text = "desync";
+		Default = "G";
+		Mode = "Toggle";
+		NoUI = false;
+	})
+	DesyncGroupBox:AddSlider("DesyncXMin",{
+		Text = "x min";
+		Default = 0;
+		Min = -15;
+		Max = 15;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncXMax",{
+		Text = "x max";
+		Default = 0;
+		Min = -50;
+		Max = 50;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncYMin",{
+		Text = "y min";
+		Default = 0;
+		Min = -15;
+		Max = 15;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncYMax",{
+		Text = "y max";
+		Default = 0;
+		Min = -50;
+		Max = 50;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncZMin",{
+		Text = "z min";
+		Default = 0;
+		Min = -15;
+		Max = 15;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncZMax",{
+		Text = "z max";
+		Default = 0;
+		Min = -50;
+		Max = 50;
+		Rounding = 0;
+		Suffix = "s";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncPitch",{
+		Text = "pitch";
+		Default = 0;
+		Min = 0;
+		Max = 360;
+		Rounding = 0;
+		Suffix = "°";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncYaw",{
+		Text = "yaw";
+		Default = 0;
+		Min = 0;
+		Max = 360;
+		Rounding = 0;
+		Suffix = "°";
+		Compact = true;
+	})
+	DesyncGroupBox:AddSlider("DesyncRoll",{
+		Text = "roll";
+		Default = 0;
+		Min = 0;
+		Max = 360;
+		Rounding = 0;
+		Suffix = "°";
+		Compact = true;
+	})
+
+	-- VISUALS TAB
+	local ESPGroupBox = Tabs.Visuals:AddLeftGroupbox("esp")
+	local SPIGroupBox = Tabs.Visuals:AddRightGroupbox("server position indicator")
+	local VisualsCharacterGroupBox = Tabs.Visuals:AddRightGroupbox("character")
+
+	ESPGroupBox:AddToggle("ESPBox",{
+		Text = "box";
+	})
+	ESPGroupBox:AddToggle("ESPName",{
+		Text = "name";
+	})
+	ESPGroupBox:AddDropdown("ESPNametype",{
+		Text = "name type";
+		Values = {"username","displayname"};
+		Default = 1;
+		Multi = false;
+	})
+	ESPGroupBox:AddToggle("ESPWeapon",{
+		Text = "weapon"
+	})
+	ESPGroupBox:AddToggle("ESPDistance",{
+		Text = "distance"
+	})
+	ESPGroupBox:AddToggle("ESPHealth",{
+		Text = "health"
+	})
+	ESPGroupBox:AddToggle("ESPArmor",{
+		Text = "armor"
+	})
+
+	SPIGroupBox:AddToggle("SPIToggle",{
+		Text = "enabled"
+	}):AddColorPicker("SPIHighlightColor", {
+		Default = Color3.new(1, 1, 1),
+	})
+	SPIGroupBox:AddToggle("SPIDisplayPriority",{
+		Text = "display priority"
+	})
+	SPIGroupBox:AddToggle("SPIAlwaysShow",{
+		Text = "always show"
+	})
+	SPIGroupBox:AddToggle("SPIMovingRotation",{
+		Text = "moving rotation"
+	})
+
+	VisualsCharacterGroupBox:AddToggle("HeadlessKorbloxToggle",{
+		Text = "headless and korblox";
+	})
+
+	-- MISC TAB
+	local ChatMiscGroupBox = Tabs.Misc:AddLeftGroupbox("chat misc")
+	local ShopGroupBox = Tabs.Misc:AddLeftGroupbox("shop")
+	local TextChatService = game:GetService("TextChatService")
+
+	ChatMiscGroupBox:AddToggle("ChatSpyToggle",{
+		Text = "chat spy";
+		Callback = function(Value)
+			TextChatService.ChatWindowConfiguration.Enabled = Value
+		end,
+	})
+	ChatMiscGroupBox:AddToggle("ShitTalkToggle",{
+		Text = "shit talk"
+	})
+
+	ShopGroupBox:AddDropdown("ShopList",{
+		Values = UI.itemShop;
+		Default = 0;
+		Multi = false;
+		Text = "item";
+	})
+
+	-- Store shop button for logic module to add functionality
+	UI.ShopBuyButton = ShopGroupBox:AddButton({
+		Text = "buy item";
+		Func = function()
+			print('yo')
+		end,
+	})
+
+	UI.ShopBuyAmmoButton = UI.ShopBuyButton:AddButton({
+		Text = "buy held ammo";
+		Func = function()
+			print('yo')
+		end,
+	})
+
+	-- SETTINGS TAB
+	local UnloadGroupBox = Tabs.Settings:AddLeftGroupbox("unload")
+	UnloadGroupBox:AddButton("unload", function() Library:Unload() end)
+
+	-- Finalize UI
+	Library.KeybindFrame.Visible = true
+	Library.ToggleKeybind = Enum.KeyCode.RightControl
+
+	SaveManager:SetLibrary(Library)
+	ThemeManager:SetLibrary(Library)
+	SaveManager:IgnoreThemeSettings()
+	SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+	SaveManager:BuildConfigSection(Tabs.Settings)
+	SaveManager:LoadAutoloadConfig()
+	ThemeManager:ApplyTheme("Havoc")
+
+	Library:Notify("👑✅", 3)
+
+	-- Return references needed by logic module
+	return {
+		Library = Library,
+		Toggles = Toggles,
+		Options = Options,
+		ShopBuyButton = UI.ShopBuyButton,
+		ShopBuyAmmoButton = UI.ShopBuyAmmoButton,
+	}
+end
+
+return UI
