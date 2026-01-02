@@ -1,0 +1,4 @@
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/havoceternal/crowntetsingtimes2/refs/heads/main/UI"))()
+local uiRefs = UI:Initialize()
+local Logic = loadstring(game:HttpGet("https://raw.githubusercontent.com/havoceternal/crowntetsingtimes2/refs/heads/main/logic"))()
+Logic:Initialize(uiRefs)
