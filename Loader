@@ -1,4 +1,25 @@
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/havoceternal/crowntetsingtimes2/refs/heads/main/UI"))()
-local uiRefs = UI:Initialize()
-local Logic = loadstring(game:HttpGet("https://raw.githubusercontent.com/havoceternal/crowntetsingtimes2/refs/heads/main/logic"))()
-Logic:Initialize(uiRefs)
+local API_URL = "https://protection-api.vercel.app/api/validate"
+
+if not script_key or script_key == "" then
+    return
+end
+
+local success, result = pcall(function()
+    return game:HttpGet(API_URL .. "?key=" .. script_key)
+end)
+
+if success and result then
+    if result:find("Invalid Key") or result:find("NOT_FOUND") or result:find("404") then
+        return
+    end
+    
+    local exec_success, exec_error = pcall(function()
+        loadstring(result)()
+    end)
+    
+    if not exec_success then
+        return
+    end
+else
+    return
+end
