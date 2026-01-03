@@ -4,22 +4,28 @@ if not script_key or script_key == "" then
     return
 end
 
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+
 local success, result = pcall(function()
-    return game:HttpGet(API_URL .. "?key=" .. script_key)
+    return game:HttpGet(API_URL .. "?key=" .. script_key .. "&hwid=" .. hwid)
 end)
 
-if success and result then
-    if result:find("Invalid Key") or result:find("NOT_FOUND") or result:find("404") then
-        return
-    end
-    
-    local exec_success, exec_error = pcall(function()
-        loadstring(result)()
-    end)
-    
-    if not exec_success then
-        return
-    end
-else
+if not success then
+    return
+end
+
+if result:find("Missing parameters") then
+    return
+end
+
+if result:find("Invalid key") then
+    return
+end
+
+if result:find("HWID mismatch") then
+    return
+end
+
+if result:find("Unauthorized") then
     return
 end
