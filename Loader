@@ -1,3 +1,4 @@
+-- Replace with your Vercel URL
 local API_URL = "https://protection-api.vercel.app/api/validate"
 
 if not script_key or script_key == "" then
@@ -14,18 +15,8 @@ if not success then
     return
 end
 
-if result:find("Missing parameters") then
+if result:find("--") or result:find("404") or result:find("403") then
     return
 end
 
-if result:find("Invalid key") then
-    return
-end
-
-if result:find("HWID mismatch") then
-    return
-end
-
-if result:find("Unauthorized") then
-    return
-end
+loadstring(result)()
