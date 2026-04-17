@@ -1,4 +1,3 @@
--- Replace with your Vercel URL
 local API_URL = "https://protection-api.vercel.app/api/validate"
 
 if not script_key or script_key == "" then
