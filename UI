@@ -1,5 +1,4 @@
 -- UI MODULE
--- This module handles all UI creation and returns the necessary references
 
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,7 +15,6 @@ local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local UI = {}
 
--- Initialize shop items list
 local IgnoredShop = workspace.Ignored.Shop
 UI.itemShop = {}
 
@@ -387,7 +385,6 @@ function UI:Initialize()
 		Text = "item";
 	})
 
-	-- Store shop button for logic module to add functionality
 	UI.ShopBuyButton = ShopGroupBox:AddButton({
 		Text = "buy item";
 		Func = function()
@@ -406,7 +403,6 @@ function UI:Initialize()
 	local UnloadGroupBox = Tabs.Settings:AddLeftGroupbox("unload")
 	UnloadGroupBox:AddButton("unload", function() Library:Unload() end)
 
-	-- Finalize UI
 	Library.KeybindFrame.Visible = true
 	Library.ToggleKeybind = Enum.KeyCode.RightControl
 
@@ -420,7 +416,6 @@ function UI:Initialize()
 
 	Library:Notify("👑✅", 3)
 
-	-- Return references needed by logic module
 	return {
 		Library = Library,
 		Toggles = Toggles,
